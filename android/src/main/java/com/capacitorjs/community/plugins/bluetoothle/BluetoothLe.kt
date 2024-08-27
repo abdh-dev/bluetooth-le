@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothSocket
 import android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
@@ -39,6 +40,8 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import java.util.UUID
+import java.io.OutputStream
+
 
 
 @SuppressLint("MissingPermission")
@@ -88,6 +91,9 @@ class BluetoothLe : Plugin() {
         private const val CONNECTION_TIMEOUT: Float = 10000.0F
         private const val DEFAULT_TIMEOUT: Float = 5000.0F
     }
+
+    private var outputStream: OutputStream? = null
+    private var bluetoothSocket: BluetoothSocket? = null
 
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var stateReceiver: BroadcastReceiver? = null
@@ -436,6 +442,64 @@ class BluetoothLe : Plugin() {
 
     @PluginMethod
     fun connect(call: PluginCall) {
+        outputStream = null
+        bluetoothSocket = null
+
+        // code diali
+        val _bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        // if (_bluetoothAdapter != null && _bluetoothAdapter.isEnabled) {
+        // if (_bluetoothAdapter == null || !_bluetoothAdapter.isEnabled) {
+        if (!(_bluetoothAdapter != null && _bluetoothAdapter.isEnabled)) {
+            call.reject("Problema adapter.")
+            return
+        }
+
+        try {
+            val mac = getDeviceId(call)
+            val bluetoothAddress = mac//"66:02:BD:06:18:7B" // replace with your device's address
+            val bluetoothDevice = _bluetoothAdapter.getRemoteDevice(bluetoothAddress)
+            bluetoothSocket = bluetoothDevice?.createRfcommSocketToServiceRecord(
+                UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+            )
+            _bluetoothAdapter.cancelDiscovery()
+            bluetoothSocket?.connect()
+            if (bluetoothSocket!!.isConnected) {
+                outputStream = bluetoothSocket!!.outputStream
+                //outputStream.write("\n".toByteArray())
+                call.resolve()
+                return
+            }else{
+                // Log.d(TAG, "Desconectado: ")
+                call.reject("Disconnected.")
+                return
+            }
+            //bluetoothSocket?.close()
+        } catch (e: Exception){
+            var code:Int = e.hashCode() //1535159 apagado //
+            // Log.d(TAG, "connect: ${e.message} code $code")
+            outputStream?.close()
+
+            call.reject("connect: ${e.message} code $code.")
+            return
+        }
+
+        // val mac = getDeviceId(call)
+        // val bluetoothDevice = _bluetoothAdapter.getRemoteDevice(mac)
+        // val bluetoothSocket = bluetoothDevice?.createRfcommSocketToServiceRecord(
+        //         UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+        // )
+        // _bluetoothAdapter.cancelDiscovery()
+        // bluetoothSocket?.connect()
+        // if (bluetoothSocket!!.isConnected) {
+        //     outputStream = bluetoothSocket!!.outputStream
+        // }else{
+        //     call.reject("Failed to connect.")
+        //     return
+        // }
+
+        // end code diali
+        return
+
         val device = getOrCreateDevice(call) ?: return
         val timeout = call.getFloat("timeout", CONNECTION_TIMEOUT)!!.toLong()
         device.connect(timeout) { response ->
@@ -483,6 +547,21 @@ class BluetoothLe : Plugin() {
 
     @PluginMethod
     fun disconnect(call: PluginCall) {
+        // code diali
+        if(outputStream != null){
+            outputStream?.close()
+            outputStream = null
+        }
+
+        if(bluetoothSocket != null){
+            bluetoothSocket?.close()
+            bluetoothSocket = null
+        }
+
+        call.resolve()
+        return
+        // end code diali
+
         val device = getOrCreateDevice(call) ?: return
         val timeout = call.getFloat("timeout", DEFAULT_TIMEOUT)!!.toLong()
         device.disconnect(timeout) { response ->
@@ -639,6 +718,39 @@ class BluetoothLe : Plugin() {
 
     @PluginMethod
     fun write(call: PluginCall) {
+        // had l code diali
+        if(outputStream == null) {
+            call.reject("The printer is not connected")
+            return
+        }
+
+
+        // var bytes: ByteArray = "\n".toByteArray()
+        val _value = call.getString("value", null)
+        if (_value == null) {
+            call.reject("Value required.")
+            return
+        }
+
+        var bytes = stringToBytes(_value)
+
+        try{
+            // bluetoothSocket!!.outputStream.write(bytes)
+            outputStream?.run {
+                write(bytes)
+                call.resolve()
+                //Log.d(TAG, "result print: ${bytes}")
+            }
+        }catch (e: Exception){
+            outputStream = null
+            call.reject("The printer is not connected, info:${e.message}")
+            return
+            //mensajeToast("Dispositivo fue desconectado, reconecte")
+            //Log.d(TAG, "state print: ${e.message}")
+        }
+        return
+        // had l code diali
+
         val device = getDevice(call) ?: return
         val characteristic = getCharacteristic(call) ?: return
         val value = call.getString("value", null)
