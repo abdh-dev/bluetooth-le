@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.0](https://github.com/capacitor-community/bluetooth-le/compare/v6.0.2...v6.1.0) (2024-11-21)
+
+
+### Features
+
+* **android:** Add getBondedDevices method to retrieve bonded devices on Android ([#716](https://github.com/capacitor-community/bluetooth-le/issues/716)) ([91a4d00](https://github.com/capacitor-community/bluetooth-le/commit/91a4d0089d4a3125987cc5d4cb0934bb7c004ffd))
+
+### [6.0.2](https://github.com/capacitor-community/bluetooth-le/compare/v6.0.1...v6.0.2) (2024-11-03)
+
+### Features
+
+* improve byte to hex string conversion optimizations ([#701](https://github.com/capacitor-community/bluetooth-le/issues/701)) ([e064587](https://github.com/capacitor-community/bluetooth-le/commit/e064587a7fd55891ec2b4bf1440b9c8d792cc182))
+
 ### [6.0.1](https://github.com/capacitor-community/bluetooth-le/compare/v6.0.0...v6.0.1) (2024-07-22)
 
 
