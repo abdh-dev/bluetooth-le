@@ -76,13 +76,25 @@ var capacitorCommunityBluetoothLe = (function (exports, core) {
     function numberToUUID(value) {
         return `0000${value.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`;
     }
-    function hexStringToDataView(value) {
-        const numbers = value
-            .trim()
-            .split(' ')
-            .filter((e) => e !== '')
-            .map((s) => parseInt(s, 16));
-        return numbersToDataView(numbers);
+    /**
+     * Convert a string of hex into a DataView of raw bytes.
+     * Note: characters other than [0-9a-fA-F] are ignored
+     * @param hex string of values, e.g. "00 01 02" or "000102"
+     * @return DataView of raw bytes
+     */
+    function hexStringToDataView(hex) {
+        const bin = [];
+        let i, c, isEmpty = 1, buffer = 0;
+        for (i = 0; i < hex.length; i++) {
+            c = hex.charCodeAt(i);
+            if ((c > 47 && c < 58) || (c > 64 && c < 71) || (c > 96 && c < 103)) {
+                buffer = (buffer << 4) ^ ((c > 64 ? c + 9 : c) & 15);
+                if ((isEmpty ^= 1)) {
+                    bin.push(buffer & 0xff);
+                }
+            }
+        }
+        return numbersToDataView(bin);
     }
     function dataViewToHexString(value) {
         return dataViewToNumbers(value)
@@ -260,6 +272,20 @@ var capacitorCommunityBluetoothLe = (function (exports, core) {
                 await BluetoothLe.requestLEScan(options);
             });
         }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        async requestNonLEScan(options, callback) {
+            options = this.validateRequestBleDeviceOptions(options);
+            await this.queue(async () => {
+                var _a;
+                await ((_a = this.scanListener) === null || _a === void 0 ? void 0 : _a.remove());
+                this.scanListener = await BluetoothLe.addListener('onScanResult', (resultInternal) => {
+                    callback(resultInternal);
+                });
+                await BluetoothLe.requestNonLEScan(options);
+            });
+        }
         async stopLEScan() {
             await this.queue(async () => {
                 var _a;
@@ -284,6 +310,12 @@ var capacitorCommunityBluetoothLe = (function (exports, core) {
             services = services.map(parseUUID);
             return this.queue(async () => {
                 const result = await BluetoothLe.getConnectedDevices({ services });
+                return result.devices;
+            });
+        }
+        async getBondedDevices() {
+            return this.queue(async () => {
+                const result = await BluetoothLe.getBondedDevices();
                 return result.devices;
             });
         }
@@ -578,6 +610,12 @@ var capacitorCommunityBluetoothLe = (function (exports, core) {
                 keepRepeatedDevices: options === null || options === void 0 ? void 0 : options.allowDuplicates,
             });
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        async requestNonLEScan(options) {
+            return {};
+        }
         onAdvertisementReceived(event) {
             var _a, _b;
             const deviceId = event.device.id;
@@ -629,6 +667,9 @@ var capacitorCommunityBluetoothLe = (function (exports, core) {
                 return bleDevice;
             });
             return { devices: bleDevices };
+        }
+        async getBondedDevices() {
+            return {};
         }
         async connect(options) {
             var _a, _b;

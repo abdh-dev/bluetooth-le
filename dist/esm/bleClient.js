@@ -112,6 +112,17 @@ class BleClientClass {
             await BluetoothLe.requestLEScan(options);
         });
     }
+    async requestNonLEScan(options, callback) {
+        options = this.validateRequestBleDeviceOptions(options);
+        await this.queue(async () => {
+            var _a;
+            await ((_a = this.scanListener) === null || _a === void 0 ? void 0 : _a.remove());
+            this.scanListener = await BluetoothLe.addListener('onScanResult', (resultInternal) => {
+                callback(resultInternal);
+            });
+            await BluetoothLe.requestNonLEScan(options);
+        });
+    }
     async stopLEScan() {
         await this.queue(async () => {
             var _a;
@@ -136,6 +147,12 @@ class BleClientClass {
         services = services.map(parseUUID);
         return this.queue(async () => {
             const result = await BluetoothLe.getConnectedDevices({ services });
+            return result.devices;
+        });
+    }
+    async getBondedDevices() {
+        return this.queue(async () => {
+            const result = await BluetoothLe.getBondedDevices();
             return result.devices;
         });
     }

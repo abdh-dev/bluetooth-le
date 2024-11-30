@@ -20,11 +20,13 @@ export declare class BluetoothLeWeb extends WebPlugin implements BluetoothLePlug
     setDisplayStrings(): Promise<void>;
     requestDevice(options?: RequestBleDeviceOptions): Promise<BleDevice>;
     requestLEScan(options?: RequestBleDeviceOptions): Promise<void>;
+    requestNonLEScan(options?: RequestBleDeviceOptions): Promise<void>;
     private onAdvertisementReceivedCallback;
     private onAdvertisementReceived;
     stopLEScan(): Promise<void>;
     getDevices(options: GetDevicesOptions): Promise<GetDevicesResult>;
     getConnectedDevices(_options: GetConnectedDevicesOptions): Promise<GetDevicesResult>;
+    getBondedDevices(): Promise<GetDevicesResult>;
     connect(options: DeviceIdOptions & TimeoutOptions): Promise<void>;
     private onDisconnectedCallback;
     private onDisconnected;

@@ -4,13 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothSocket
 import android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothSocket
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
@@ -26,6 +26,7 @@ import android.os.ParcelUuid
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.provider.Settings.ACTION_BLUETOOTH_SETTINGS
 import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
+import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.core.location.LocationManagerCompat
 import com.getcapacitor.JSArray
@@ -39,9 +40,10 @@ import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
-import java.util.UUID
+import org.json.JSONArray
+import org.json.JSONException
 import java.io.OutputStream
-
+import java.util.UUID
 
 
 @SuppressLint("MissingPermission")
@@ -396,7 +398,50 @@ class BluetoothLe : Plugin() {
                         Logger.error(TAG, "Error in notifyListeners: ${e.localizedMessage}", e)
                     }
                 }
-            })
+            }
+        )
+    }
+
+    @PluginMethod
+    fun requestNonLEScan(call: PluginCall) {
+        assertBluetoothAdapter(call) ?: return
+
+        try {
+            deviceScanner?.stopScanning()
+        } catch (e: IllegalStateException) {
+            Logger.error(TAG, "Error in requestLEScan: ${e.localizedMessage}", e)
+            call.reject(e.localizedMessage)
+            return
+        }
+
+        deviceScanner = DeviceScanner(
+            context,
+            bluetoothAdapter!!,
+            scanDuration = null,
+            displayStrings = displayStrings!!,
+            showDialog = false,
+        )
+        deviceScanner?.startNonLeScan(
+            activity,
+            { scanResponse ->
+                run {
+                    if (scanResponse.success) {
+                        call.resolve()
+                    } else {
+                        call.reject(scanResponse.message)
+                    }
+                }
+            },
+            { result ->
+                run {
+                    try {
+                        notifyListeners("onScanResult", result)
+                    } catch (e: ConcurrentModificationException) {
+                        Logger.error(TAG, "Error in notifyListeners: ${e.localizedMessage}", e)
+                    }
+                }
+            }
+        )
     }
 
     @PluginMethod
@@ -404,6 +449,7 @@ class BluetoothLe : Plugin() {
         assertBluetoothAdapter(call) ?: return
         try {
             deviceScanner?.stopScanning()
+            bluetoothAdapter?.cancelDiscovery()
         } catch (e: IllegalStateException) {
             Logger.error(TAG, "Error in stopLEScan: ${e.localizedMessage}", e)
         }
@@ -444,7 +490,8 @@ class BluetoothLe : Plugin() {
     fun getBondedDevices(call: PluginCall) {
         assertBluetoothAdapter(call) ?: return
 
-        val bluetoothManager = activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bluetoothManager =
+            activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val bluetoothAdapter = bluetoothManager.adapter
 
         if (bluetoothAdapter == null) {
@@ -492,14 +539,14 @@ class BluetoothLe : Plugin() {
                 //outputStream.write("\n".toByteArray())
                 call.resolve()
                 return
-            }else{
+            } else {
                 // Log.d(TAG, "Desconectado: ")
                 call.reject("Disconnected.")
                 return
             }
             //bluetoothSocket?.close()
-        } catch (e: Exception){
-            var code:Int = e.hashCode() //1535159 apagado //
+        } catch (e: Exception) {
+            var code: Int = e.hashCode() //1535159 apagado //
             // Log.d(TAG, "connect: ${e.message} code $code")
             outputStream?.close()
 
@@ -572,12 +619,12 @@ class BluetoothLe : Plugin() {
     @PluginMethod
     fun disconnect(call: PluginCall) {
         // code diali
-        if(outputStream != null){
+        if (outputStream != null) {
             outputStream?.close()
             outputStream = null
         }
 
-        if(bluetoothSocket != null){
+        if (bluetoothSocket != null) {
             bluetoothSocket?.close()
             bluetoothSocket = null
         }
@@ -743,7 +790,7 @@ class BluetoothLe : Plugin() {
     @PluginMethod
     fun write(call: PluginCall) {
         // had l code diali
-        if(outputStream == null) {
+        if (outputStream == null) {
             call.reject("The printer is not connected")
             return
         }
@@ -758,14 +805,14 @@ class BluetoothLe : Plugin() {
 
         var bytes = stringToBytes(_value)
 
-        try{
+        try {
             // bluetoothSocket!!.outputStream.write(bytes)
             outputStream?.run {
                 write(bytes)
                 call.resolve()
                 //Log.d(TAG, "result print: ${bytes}")
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             outputStream = null
             call.reject("The printer is not connected, info:${e.message}")
             return

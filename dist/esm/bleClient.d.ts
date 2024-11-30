@@ -1,5 +1,5 @@
 import type { DisplayStrings } from './config';
-import type { BleDevice, BleService, ConnectionPriority, InitializeOptions, RequestBleDeviceOptions, ScanResult, TimeoutOptions } from './definitions';
+import type { BleDevice, BleService, ConnectionPriority, InitializeOptions, NonLEScanResult, RequestBleDeviceOptions, ScanResult, TimeoutOptions } from './definitions';
 export interface BleClientInterface {
     /**
      * Initialize Bluetooth Low Energy (BLE). If it fails, BLE might be unavailable on this device.
@@ -83,6 +83,14 @@ export interface BleClientInterface {
      */
     requestLEScan(options: RequestBleDeviceOptions, callback: (result: ScanResult) => void): Promise<void>;
     /**
+     * Start scanning for non BLE devices to interact with according to the filters in the options. The callback will be invoked on each device that is found.
+     * Scanning will continue until `stopLEScan` is called. For an example, see [usage](#usage).
+     * **Note**: Use with care on **web** platform, the required API is still behind a flag in most browsers.
+     * @param options
+     * @param callback
+     */
+    requestNonLEScan(options: RequestBleDeviceOptions, callback: (result: NonLEScanResult) => void): Promise<void>;
+    /**
      * Stop scanning for BLE devices. For an example, see [usage](#usage).
      */
     stopLEScan(): Promise<void>;
@@ -94,6 +102,12 @@ export interface BleClientInterface {
      * @param deviceIds List of device IDs, e.g. saved from a previous app run.
      */
     getDevices(deviceIds: string[]): Promise<BleDevice[]>;
+    /**
+     * Get a list of currently bonded devices.
+     * Only available on **Android**.
+     * Uses [getBondedDevices](https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#getBondedDevices()) on Android
+     */
+    getBondedDevices(): Promise<BleDevice[]>;
     /**
      * Get a list of currently connected devices.
      * Uses [retrieveConnectedPeripherals](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518924-retrieveconnectedperipherals) on iOS,
@@ -243,9 +257,11 @@ declare class BleClientClass implements BleClientInterface {
     setDisplayStrings(displayStrings: DisplayStrings): Promise<void>;
     requestDevice(options?: RequestBleDeviceOptions): Promise<BleDevice>;
     requestLEScan(options: RequestBleDeviceOptions, callback: (result: ScanResult) => void): Promise<void>;
+    requestNonLEScan(options: RequestBleDeviceOptions, callback: (result: NonLEScanResult) => void): Promise<void>;
     stopLEScan(): Promise<void>;
     getDevices(deviceIds: string[]): Promise<BleDevice[]>;
     getConnectedDevices(services: string[]): Promise<BleDevice[]>;
+    getBondedDevices(): Promise<BleDevice[]>;
     connect(deviceId: string, onDisconnect?: (deviceId: string) => void, options?: TimeoutOptions): Promise<void>;
     createBond(deviceId: string, options?: TimeoutOptions): Promise<void>;
     isBonded(deviceId: string): Promise<boolean>;

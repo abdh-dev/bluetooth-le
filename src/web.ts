@@ -119,6 +119,13 @@ export class BluetoothLeWeb extends WebPlugin implements BluetoothLePlugin {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async requestNonLEScan(options?: RequestBleDeviceOptions): Promise<void> {
+     return {} as Promise<void>;
+  }
+
   private onAdvertisementReceivedCallback = this.onAdvertisementReceived.bind(this);
 
   private onAdvertisementReceived(event: BluetoothAdvertisingEvent): void {

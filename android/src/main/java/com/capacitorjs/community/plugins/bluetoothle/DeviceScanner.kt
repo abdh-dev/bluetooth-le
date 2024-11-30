@@ -1,6 +1,7 @@
 package com.capacitorjs.community.plugins.bluetoothle
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -8,11 +9,19 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.ArrayAdapter
+import com.capacitorjs.community.plugins.bluetoothle.BluetoothLe.Companion
+import com.getcapacitor.JSObject
 import com.getcapacitor.Logger
+import org.json.JSONArray
+import org.json.JSONException
 
 
 class ScanResponse(
@@ -31,7 +40,7 @@ class DisplayStrings(
 @SuppressLint("MissingPermission")
 class DeviceScanner(
     private val context: Context,
-    bluetoothAdapter: BluetoothAdapter,
+    private val bluetoothAdapter: BluetoothAdapter,
     private val scanDuration: Long?,
     private val displayStrings: DisplayStrings,
     private val showDialog: Boolean,
@@ -119,6 +128,74 @@ class DeviceScanner(
         }
     }
 
+    fun startNonLeScan(
+        activity: Activity,
+        callback: (ScanResponse) -> Unit,
+        scanResultCallback: ((JSObject) -> Unit)?
+    ) {
+        this.savedCallback = callback
+
+        deviceStrings.clear()
+        deviceList.clear()
+        if (!isScanning) {
+            setTimeoutForStopScanning()
+            Logger.debug(TAG, "Start scanning.")
+            isScanning = true
+
+            val discoverReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val action = intent.action
+                    if (BluetoothDevice.ACTION_FOUND == action) {
+                        val device =
+                            intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)!!
+                        try {
+                            scanResultCallback?.invoke(deviceToJSON(device))
+                        } catch (e: JSONException) {
+                            // This shouldn't happen, log and ignore
+                            Log.e(BluetoothLe::class.java.simpleName, "Problem converting device to JSON", e)
+                        }
+                    } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action) {
+                        activity.unregisterReceiver(this)
+                    }
+                }
+            }
+
+            activity.registerReceiver(discoverReceiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
+            activity.registerReceiver(
+                discoverReceiver,
+                IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+            )
+            bluetoothAdapter.startDiscovery()
+
+            savedCallback?.invoke(
+                ScanResponse(
+                    true, "Started scanning.", null
+                )
+            )
+            savedCallback = null
+        } else {
+            stopScanning()
+            savedCallback?.invoke(
+                ScanResponse(
+                    false, "Already scanning. Stopping now.", null
+                )
+            )
+            savedCallback = null
+        }
+    }
+
+    @Throws(JSONException::class)
+    private fun deviceToJSON(device: BluetoothDevice): JSObject {
+        val json = JSObject()
+        json.put("name", device.name)
+        json.put("address", device.address)
+        json.put("id", device.address)
+        if (device.bluetoothClass != null) {
+            json.put("class", device.bluetoothClass.deviceClass)
+        }
+        return json
+    }
+
     fun stopScanning() {
         stopScanHandler?.removeCallbacksAndMessages(null)
         stopScanHandler = null
@@ -134,6 +211,7 @@ class DeviceScanner(
         Logger.debug(TAG, "Stop scanning.")
         isScanning = false
         bluetoothLeScanner?.stopScan(scanCallback)
+        bluetoothAdapter.cancelDiscovery()
     }
 
     private fun showDeviceList() {
@@ -186,5 +264,4 @@ class DeviceScanner(
             )
         }
     }
-
 }

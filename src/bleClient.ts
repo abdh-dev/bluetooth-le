@@ -9,6 +9,8 @@ import type {
   ConnectionPriority,
   Data,
   InitializeOptions,
+  NonLEScanResult,
+  NonLEScanResultInternal,
   ReadResult,
   RequestBleDeviceOptions,
   ScanResult,
@@ -114,6 +116,15 @@ export interface BleClientInterface {
    * @param callback
    */
   requestLEScan(options: RequestBleDeviceOptions, callback: (result: ScanResult) => void): Promise<void>;
+
+  /**
+   * Start scanning for non BLE devices to interact with according to the filters in the options. The callback will be invoked on each device that is found.
+   * Scanning will continue until `stopLEScan` is called. For an example, see [usage](#usage).
+   * **Note**: Use with care on **web** platform, the required API is still behind a flag in most browsers.
+   * @param options
+   * @param callback
+   */
+  requestNonLEScan(options: RequestBleDeviceOptions, callback: (result: NonLEScanResult) => void): Promise<void>;
 
   /**
    * Stop scanning for BLE devices. For an example, see [usage](#usage).
@@ -435,6 +446,17 @@ class BleClientClass implements BleClientInterface {
         callback(result);
       });
       await BluetoothLe.requestLEScan(options);
+    });
+  }
+
+  async requestNonLEScan(options: RequestBleDeviceOptions, callback: (result: NonLEScanResult) => void): Promise<void> {
+    options = this.validateRequestBleDeviceOptions(options);
+    await this.queue(async () => {
+      await this.scanListener?.remove();
+      this.scanListener = await BluetoothLe.addListener('onScanResult', (resultInternal: NonLEScanResultInternal) => {
+        callback(resultInternal);
+      });
+      await BluetoothLe.requestNonLEScan(options);
     });
   }
 

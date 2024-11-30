@@ -164,6 +164,34 @@ public class BluetoothLe: CAPPlugin {
         )
     }
 
+    @objc func requestNonLEScan(_ call: CAPPluginCall) {
+        guard let deviceManager = self.getDeviceManager(call) else { return }
+
+        let serviceUUIDs = self.getServiceUUIDs(call)
+        let name = call.getString("name")
+        let namePrefix = call.getString("namePrefix")
+        let allowDuplicates = call.getBool("allowDuplicates", false)
+
+        deviceManager.startScanning(
+            serviceUUIDs,
+            name,
+            namePrefix,
+            allowDuplicates,
+            false,
+            nil, {(success, message) in
+                if success {
+                    call.resolve()
+                } else {
+                    call.reject(message)
+                }
+            }, {(device, advertisementData, rssi) in
+                self.deviceMap[device.getId()] = device
+                let data = self.getScanResult(device, advertisementData, rssi)
+                self.notifyListeners("onScanResult", data: data)
+            }
+        )
+    }
+
     @objc func stopLEScan(_ call: CAPPluginCall) {
         guard let deviceManager = self.getDeviceManager(call) else { return }
         deviceManager.stopScan()

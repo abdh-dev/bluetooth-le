@@ -17,7 +17,7 @@
         ],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "Initialize Bluetooth Low Energy (BLE). If it fails, BLE might be unavailable on this device.\r\nOn **Android** it will ask for the location permission. On **iOS** it will ask for the Bluetooth permission.\r\nFor an example, see [usage](#usage).",
+        "docs": "Initialize Bluetooth Low Energy (BLE). If it fails, BLE might be unavailable on this device.\nOn **Android** it will ask for the location permission. On **iOS** it will ask for the Bluetooth permission.\nFor an example, see [usage](#usage).",
         "complexTypes": [
           "InitializeOptions"
         ],
@@ -29,7 +29,7 @@
         "parameters": [],
         "returns": "Promise<boolean>",
         "tags": [],
-        "docs": "Reports whether Bluetooth is enabled on this device.\r\nAlways returns `true` on **web**.",
+        "docs": "Reports whether Bluetooth is enabled on this device.\nAlways returns `true` on **web**.",
         "complexTypes": [],
         "slug": "isenabled"
       },
@@ -39,7 +39,7 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "Request enabling Bluetooth. Show a system activity that allows the user to turn on Bluetooth. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#ACTION_REQUEST_ENABLE\r\nOnly available on **Android**.",
+        "docs": "Request enabling Bluetooth. Show a system activity that allows the user to turn on Bluetooth. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#ACTION_REQUEST_ENABLE\nOnly available on **Android**.",
         "complexTypes": [],
         "slug": "requestenable"
       },
@@ -54,7 +54,7 @@
             "text": "Will fail on Android SDK >= 33. Use `requestEnable` instead. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#enable()"
           }
         ],
-        "docs": "Enable Bluetooth.\r\nOnly available on **Android**.\r\n**Deprecated** Will fail on Android SDK >= 33. Use `requestEnable` instead. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#enable()",
+        "docs": "Enable Bluetooth.\nOnly available on **Android**.\n**Deprecated** Will fail on Android SDK >= 33. Use `requestEnable` instead. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#enable()",
         "complexTypes": [],
         "slug": "enable"
       },
@@ -69,7 +69,7 @@
             "text": "Will fail on Android SDK >= 33. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#disable()"
           }
         ],
-        "docs": "Disable Bluetooth.\r\nOnly available on **Android**.\r\n**Deprecated** Will fail on Android SDK >= 33. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#disable()",
+        "docs": "Disable Bluetooth.\nOnly available on **Android**.\n**Deprecated** Will fail on Android SDK >= 33. See https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#disable()",
         "complexTypes": [],
         "slug": "disable"
       },
@@ -90,7 +90,7 @@
             "text": "callback Callback function to use when the Bluetooth state changes."
           }
         ],
-        "docs": "Register a callback function that will be invoked when Bluetooth is enabled (true) or disabled (false) on this device.\r\nNot available on **web** (the callback will never be invoked).",
+        "docs": "Register a callback function that will be invoked when Bluetooth is enabled (true) or disabled (false) on this device.\nNot available on **web** (the callback will never be invoked).",
         "complexTypes": [],
         "slug": "startenablednotifications"
       },
@@ -110,7 +110,7 @@
         "parameters": [],
         "returns": "Promise<boolean>",
         "tags": [],
-        "docs": "Reports whether Location Services are enabled on this device.\r\nOnly available on **Android**.",
+        "docs": "Reports whether Location Services are enabled on this device.\nOnly available on **Android**.",
         "complexTypes": [],
         "slug": "islocationenabled"
       },
@@ -120,7 +120,7 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "Open Location settings.\r\nOnly available on **Android**.",
+        "docs": "Open Location settings.\nOnly available on **Android**.",
         "complexTypes": [],
         "slug": "openlocationsettings"
       },
@@ -130,7 +130,7 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "Open Bluetooth settings.\r\nOnly available on **Android**.",
+        "docs": "Open Bluetooth settings.\nOnly available on **Android**.",
         "complexTypes": [],
         "slug": "openbluetoothsettings"
       },
@@ -140,7 +140,7 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "Open App settings.\r\nNot available on **web**.\r\nOn **iOS** when a user declines the request to use Bluetooth on the first call of `initialize`, it is not possible\r\nto request for Bluetooth again from within the app. In this case Bluetooth has to be enabled in the app settings\r\nfor the app to be able use it.",
+        "docs": "Open App settings.\nNot available on **web**.\nOn **iOS** when a user declines the request to use Bluetooth on the first call of `initialize`, it is not possible\nto request for Bluetooth again from within the app. In this case Bluetooth has to be enabled in the app settings\nfor the app to be able use it.",
         "complexTypes": [],
         "slug": "openappsettings"
       },
@@ -184,7 +184,7 @@
             "text": "options Device filters, see [RequestBleDeviceOptions](#RequestBleDeviceOptions)"
           }
         ],
-        "docs": "Request a peripheral BLE device to interact with. This will scan for available devices according to the filters in the options and show a dialog to pick a device.\r\nFor an example, see [usage](#usage).",
+        "docs": "Request a peripheral BLE device to interact with. This will scan for available devices according to the filters in the options and show a dialog to pick a device.\nFor an example, see [usage](#usage).",
         "complexTypes": [
           "BleDevice",
           "RequestBleDeviceOptions"
@@ -217,12 +217,45 @@
             "text": "callback"
           }
         ],
-        "docs": "Start scanning for BLE devices to interact with according to the filters in the options. The callback will be invoked on each device that is found.\r\nScanning will continue until `stopLEScan` is called. For an example, see [usage](#usage).\r\n**Note**: Use with care on **web** platform, the required API is still behind a flag in most browsers.",
+        "docs": "Start scanning for BLE devices to interact with according to the filters in the options. The callback will be invoked on each device that is found.\nScanning will continue until `stopLEScan` is called. For an example, see [usage](#usage).\n**Note**: Use with care on **web** platform, the required API is still behind a flag in most browsers.",
         "complexTypes": [
           "RequestBleDeviceOptions",
           "ScanResult"
         ],
         "slug": "requestlescan"
+      },
+      {
+        "name": "requestNonLEScan",
+        "signature": "(options: RequestBleDeviceOptions, callback: (result: NonLEScanResult) => void) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "RequestBleDeviceOptions"
+          },
+          {
+            "name": "callback",
+            "docs": "",
+            "type": "(result: NonLEScanResult) => void"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options"
+          },
+          {
+            "name": "param",
+            "text": "callback"
+          }
+        ],
+        "docs": "Start scanning for non BLE devices to interact with according to the filters in the options. The callback will be invoked on each device that is found.\nScanning will continue until `stopLEScan` is called. For an example, see [usage](#usage).\n**Note**: Use with care on **web** platform, the required API is still behind a flag in most browsers.",
+        "complexTypes": [
+          "RequestBleDeviceOptions",
+          "NonLEScanResult"
+        ],
+        "slug": "requestnonlescan"
       },
       {
         "name": "stopLEScan",
@@ -251,11 +284,23 @@
             "text": "deviceIds List of device IDs, e.g. saved from a previous app run."
           }
         ],
-        "docs": "On iOS and web, if you want to connect to a previously connected device without scanning first, you can use `getDevice`.\r\nUses [retrievePeripherals](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1519127-retrieveperipherals) on iOS and\r\n[getDevices](https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/getDevices) on web.\r\nOn Android, you can directly connect to the device with the deviceId.",
+        "docs": "On iOS and web, if you want to connect to a previously connected device without scanning first, you can use `getDevice`.\nUses [retrievePeripherals](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1519127-retrieveperipherals) on iOS and\n[getDevices](https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/getDevices) on web.\nOn Android, you can directly connect to the device with the deviceId.",
         "complexTypes": [
           "BleDevice"
         ],
         "slug": "getdevices"
+      },
+      {
+        "name": "getBondedDevices",
+        "signature": "() => Promise<BleDevice[]>",
+        "parameters": [],
+        "returns": "Promise<BleDevice[]>",
+        "tags": [],
+        "docs": "Get a list of currently bonded devices.\nOnly available on **Android**.\nUses [getBondedDevices](https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#getBondedDevices()) on Android",
+        "complexTypes": [
+          "BleDevice"
+        ],
+        "slug": "getbondeddevices"
       },
       {
         "name": "getConnectedDevices",
@@ -274,7 +319,7 @@
             "text": "services List of services to filter the devices by. If no service is specified, no devices will be returned. Only applies to iOS."
           }
         ],
-        "docs": "Get a list of currently connected devices.\r\nUses [retrieveConnectedPeripherals](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518924-retrieveconnectedperipherals) on iOS,\r\n[getConnectedDevices](https://developer.android.com/reference/android/bluetooth/BluetoothManager#getConnectedDevices(int)) on Android\r\nand [getDevices](https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/getDevices) on web.",
+        "docs": "Get a list of currently connected devices.\nUses [retrieveConnectedPeripherals](https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518924-retrieveconnectedperipherals) on iOS,\n[getConnectedDevices](https://developer.android.com/reference/android/bluetooth/BluetoothManager#getConnectedDevices(int)) on Android\nand [getDevices](https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/getDevices) on web.",
         "complexTypes": [
           "BleDevice"
         ],
@@ -347,7 +392,7 @@
             "text": "options Options for plugin call"
           }
         ],
-        "docs": "Create a bond with a peripheral BLE device.\r\nOnly available on **Android**. On iOS bonding is handled by the OS.",
+        "docs": "Create a bond with a peripheral BLE device.\nOnly available on **Android**. On iOS bonding is handled by the OS.",
         "complexTypes": [
           "TimeoutOptions"
         ],
@@ -370,7 +415,7 @@
             "text": "deviceId The ID of the device to use (obtained from [requestDevice](#requestDevice) or [requestLEScan](#requestLEScan))"
           }
         ],
-        "docs": "Report whether a peripheral BLE device is bonded.\r\nOnly available on **Android**. On iOS bonding is handled by the OS.",
+        "docs": "Report whether a peripheral BLE device is bonded.\nOnly available on **Android**. On iOS bonding is handled by the OS.",
         "complexTypes": [],
         "slug": "isbonded"
       },
@@ -435,7 +480,7 @@
             "text": "deviceId The ID of the device to use (obtained from [requestDevice](#requestDevice) or [requestLEScan](#requestLEScan))"
           }
         ],
-        "docs": "Discover services, characteristics and descriptors of a device.\r\nYou only need this method if your peripheral device changes its services and characteristics at runtime.\r\nIf the discovery was successful, the remote services can be retrieved using the getServices function.\r\nNot available on **web**.",
+        "docs": "Discover services, characteristics and descriptors of a device.\nYou only need this method if your peripheral device changes its services and characteristics at runtime.\nIf the discovery was successful, the remote services can be retrieved using the getServices function.\nNot available on **web**.",
         "complexTypes": [],
         "slug": "discoverservices"
       },
@@ -456,7 +501,7 @@
             "text": "deviceId The ID of the device to use (obtained from [requestDevice](#requestDevice) or [requestLEScan](#requestLEScan))"
           }
         ],
-        "docs": "Get the MTU of a connected device. Note that the maximum write value length is 3 bytes less than the MTU.\r\nNot available on **web**.",
+        "docs": "Get the MTU of a connected device. Note that the maximum write value length is 3 bytes less than the MTU.\nNot available on **web**.",
         "complexTypes": [],
         "slug": "getmtu"
       },
@@ -486,7 +531,7 @@
             "text": "connectionPriority Request a specific connection priority. See [ConnectionPriority](#connectionpriority)"
           }
         ],
-        "docs": "Request a connection parameter update.\r\nOnly available on **Android**. https://developer.android.com/reference/android/bluetooth/BluetoothGatt#requestConnectionPriority(int)",
+        "docs": "Request a connection parameter update.\nOnly available on **Android**. https://developer.android.com/reference/android/bluetooth/BluetoothGatt#requestConnectionPriority(int)",
         "complexTypes": [
           "ConnectionPriority"
         ],
@@ -509,7 +554,7 @@
             "text": "deviceId The ID of the device to use (obtained from [requestDevice](#requestDevice) or [requestLEScan](#requestLEScan))"
           }
         ],
-        "docs": "Read the RSSI value of a connected device.\r\nNot available on **web**.",
+        "docs": "Read the RSSI value of a connected device.\nNot available on **web**.",
         "complexTypes": [],
         "slug": "readrssi"
       },
@@ -857,7 +902,7 @@
             "text": "callback Callback function to use when the value of the characteristic changes"
           }
         ],
-        "docs": "Start listening to changes of the value of a characteristic.\r\nNote that you should only start the notifications once per characteristic in your app and share the data and\r\nnot call `startNotifications` in every component that needs the data.\r\nFor an example, see [usage](#usage).",
+        "docs": "Start listening to changes of the value of a characteristic.\nNote that you should only start the notifications once per characteristic in your app and share the data and\nnot call `startNotifications` in every component that needs the data.\nFor an example, see [usage](#usage).",
         "complexTypes": [
           "DataView"
         ],
@@ -1734,6 +1779,43 @@
           "docs": "Read-only. The length of the ArrayBuffer (in bytes).",
           "complexTypes": [],
           "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "NonLEScanResult",
+      "slug": "nonlescanresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "id",
+          "tags": [],
+          "docs": "ID of the device, which will be needed for further calls.\r\nOn **Android** this is the BLE MAC address.\r\nOn **iOS** and **web** it is an identifier.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "tags": [],
+          "docs": "Name of the peripheral device.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "address",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "class",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
         }
       ]
     },

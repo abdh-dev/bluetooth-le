@@ -79,6 +79,12 @@ export class BluetoothLeWeb extends WebPlugin {
             keepRepeatedDevices: options === null || options === void 0 ? void 0 : options.allowDuplicates,
         });
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async requestNonLEScan(options) {
+        return {};
+    }
     onAdvertisementReceived(event) {
         var _a, _b;
         const deviceId = event.device.id;
@@ -130,6 +136,9 @@ export class BluetoothLeWeb extends WebPlugin {
             return bleDevice;
         });
         return { devices: bleDevices };
+    }
+    async getBondedDevices() {
+        return {};
     }
     async connect(options) {
         var _a, _b;

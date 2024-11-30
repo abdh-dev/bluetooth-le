@@ -44,6 +44,39 @@ export interface RequestBleDeviceOptions {
      */
     scanMode?: ScanMode;
 }
+export interface RequestBLDeviceOptions {
+    /**
+     * Filter devices by service UUIDs.
+     * UUIDs have to be specified as 128 bit UUID strings,
+     * e.g. ['0000180d-0000-1000-8000-00805f9b34fb']
+     * There is a helper function to convert numbers to UUIDs.
+     * e.g. [numberToUUID(0x180f)]. (see [UUID format](#uuid-format))
+     */
+    services?: string[];
+    /**
+     * Filter devices by name
+     */
+    name?: string;
+    /**
+     * Filter devices by name prefix
+     */
+    namePrefix?: string;
+    /**
+     * For **web**, all services that will be used have to be listed under services or optionalServices,
+     * e.g. [numberToUUID(0x180f)] (see [UUID format](#uuid-format))
+     */
+    optionalServices?: string[];
+    /**
+     * Normally scans will discard the second and subsequent advertisements from a single device.
+     * If you need to receive them, set allowDuplicates to true (only applicable in `requestLEScan`).
+     * (default: false)
+     */
+    allowDuplicates?: boolean;
+    /**
+     * Android scan mode (default: ScanMode.SCAN_MODE_BALANCED)
+     */
+    scanMode?: ScanMode;
+}
 /**
  * Android scan mode
  */
@@ -211,6 +244,20 @@ export interface ScanResultInternal<T = Data> {
     uuids?: string[];
     rawAdvertisement?: T;
 }
+export interface NonLEScanResultInternal {
+    /**
+     * ID of the device, which will be needed for further calls.
+     * On **Android** this is the BLE MAC address.
+     * On **iOS** and **web** it is an identifier.
+     */
+    id: string;
+    /**
+     * Name of the peripheral device.
+     */
+    name: string;
+    address: string;
+    class: string;
+}
 export interface ScanResult {
     /**
      * The peripheral device that was found in the scan.
@@ -251,6 +298,20 @@ export interface ScanResult {
      */
     rawAdvertisement?: DataView;
 }
+export interface NonLEScanResult {
+    /**
+     * ID of the device, which will be needed for further calls.
+     * On **Android** this is the BLE MAC address.
+     * On **iOS** and **web** it is an identifier.
+     */
+    id: string;
+    /**
+     * Name of the peripheral device.
+     */
+    name: string;
+    address: string;
+    class: string;
+}
 export interface BluetoothLePlugin {
     initialize(options?: InitializeOptions): Promise<void>;
     isEnabled(): Promise<BooleanResult>;
@@ -266,12 +327,14 @@ export interface BluetoothLePlugin {
     setDisplayStrings(displayStrings: DisplayStrings): Promise<void>;
     requestDevice(options?: RequestBleDeviceOptions): Promise<BleDevice>;
     requestLEScan(options?: RequestBleDeviceOptions): Promise<void>;
+    requestNonLEScan(options?: RequestBleDeviceOptions): Promise<void>;
     stopLEScan(): Promise<void>;
     getDevices(options: GetDevicesOptions): Promise<GetDevicesResult>;
     getConnectedDevices(options: GetConnectedDevicesOptions): Promise<GetDevicesResult>;
+    getBondedDevices(): Promise<GetDevicesResult>;
     addListener(eventName: 'onEnabledChanged', listenerFunc: (result: BooleanResult) => void): Promise<PluginListenerHandle>;
     addListener(eventName: string, listenerFunc: (event: ReadResult) => void): Promise<PluginListenerHandle>;
-    addListener(eventName: 'onScanResult', listenerFunc: (result: ScanResultInternal) => void): Promise<PluginListenerHandle>;
+    addListener<T>(eventName: 'onScanResult', listenerFunc: (result: T) => void): Promise<PluginListenerHandle>;
     connect(options: DeviceIdOptions & TimeoutOptions): Promise<void>;
     createBond(options: DeviceIdOptions & TimeoutOptions): Promise<void>;
     isBonded(options: DeviceIdOptions): Promise<BooleanResult>;

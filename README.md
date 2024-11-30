@@ -67,6 +67,7 @@ Below is an index of all the methods available.
 - [`setDisplayStrings(...)`](#setdisplaystrings)
 - [`requestDevice(...)`](#requestdevice)
 - [`requestLEScan(...)`](#requestlescan)
+- [`requestNonLEScan(...)`](#requestnonlescan)
 - [`stopLEScan()`](#stoplescan)
 - [`getDevices(...)`](#getdevices)
 - [`getBondedDevices()`](#getbondeddevices)
@@ -560,6 +561,23 @@ Scanning will continue until `stopLEScan` is called. For an example, see [usage]
 
 ---
 
+### requestNonLEScan(...)
+
+```typescript
+requestNonLEScan(options: RequestBleDeviceOptions, callback: (result: NonLEScanResult) => void) => Promise<void>
+```
+
+Start scanning for non BLE devices to interact with according to the filters in the options. The callback will be invoked on each device that is found.
+Scanning will continue until `stopLEScan` is called. For an example, see [usage](#usage).
+**Note**: Use with care on **web** platform, the required API is still behind a flag in most browsers.
+
+| Param          | Type                                                                             |
+| -------------- | -------------------------------------------------------------------------------- |
+| **`options`**  | <code><a href="#requestbledeviceoptions">RequestBleDeviceOptions</a></code>      |
+| **`callback`** | <code>(result: <a href="#nonlescanresult">NonLEScanResult</a>) =&gt; void</code> |
+
+---
+
 ### stopLEScan()
 
 ```typescript
@@ -988,6 +1006,15 @@ buffer as needed.
 | Method    | Signature                                                                               | Description                                                     |
 | --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | **slice** | (begin: number, end?: number \| undefined) =&gt; <a href="#arraybuffer">ArrayBuffer</a> | Returns a section of an <a href="#arraybuffer">ArrayBuffer</a>. |
+
+#### NonLEScanResult
+
+| Prop          | Type                | Description                                                                                                                                       |
+| ------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**      | <code>string</code> | ID of the device, which will be needed for further calls. On **Android** this is the BLE MAC address. On **iOS** and **web** it is an identifier. |
+| **`name`**    | <code>string</code> | Name of the peripheral device.                                                                                                                    |
+| **`address`** | <code>string</code> |                                                                                                                                                   |
+| **`class`**   | <code>string</code> |                                                                                                                                                   |
 
 #### TimeoutOptions
 
