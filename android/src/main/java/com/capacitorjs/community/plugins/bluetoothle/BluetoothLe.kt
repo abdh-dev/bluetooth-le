@@ -142,7 +142,13 @@ class BluetoothLe : Plugin() {
         }
         // all have to be true
         if (granted.all { it }) {
-            runInitialization(call)
+            val useLE = call.getBoolean("useLE", true);
+
+            if (useLE == true) {
+                runInitialization(call)
+            } else {
+                runNonLEInitialization(call);
+            }
         } else {
             call.reject("Permission denied.")
         }
@@ -159,6 +165,21 @@ class BluetoothLe : Plugin() {
 
         if (bluetoothAdapter == null) {
             call.reject("BLE is not available.")
+            return
+        }
+        call.resolve()
+    }
+
+    private fun runNonLEInitialization(call: PluginCall) {
+        if (!activity.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+            call.reject("Bluetooth is not supported.")
+            return
+        }
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+
+        if (bluetoothAdapter == null) {
+            call.reject("Bluetooth is not available.")
             return
         }
         call.resolve()
@@ -957,7 +978,7 @@ class BluetoothLe : Plugin() {
 
     private fun assertBluetoothAdapter(call: PluginCall): Boolean? {
         if (bluetoothAdapter == null) {
-            call.reject("Bluetooth LE not initialized.")
+            call.reject("Bluetooth/BL LE not initialized.")
             return null
         }
         return true
