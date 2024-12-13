@@ -10,6 +10,7 @@ export interface InitializeOptions {
      * @default false
      */
     androidNeverForLocation?: boolean;
+    useLE?: boolean;
 }
 export interface RequestBleDeviceOptions {
     /**

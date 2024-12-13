@@ -969,6 +969,13 @@
           "docs": "If your app doesn't use Bluetooth scan results to derive physical\r\nlocation information, you can strongly assert that your app\r\ndoesn't derive physical location. (Android only)\r\nRequires adding 'neverForLocation' to AndroidManifest.xml\r\nhttps://developer.android.com/guide/topics/connectivity/bluetooth/permissions#assert-never-for-location",
           "complexTypes": [],
           "type": "boolean | undefined"
+        },
+        {
+          "name": "useLE",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean | undefined"
         }
       ]
     },
